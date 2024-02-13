@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Net;
+using System.Threading;
 
 namespace TeleDonut
 {
@@ -7,14 +8,18 @@ namespace TeleDonut
         static void Main(string[] args)
         {
             var donut = new Donut();
+            var server = new Server(IPAddress.Any);
+
+            server.start();
 
             while(true) {
-                var frame = donut.renderFrame();
+                if(server.clients.Count == 0) continue; // wait for any client before rendering
+
+                var frame = donut.convertFrame(donut.renderFrame());
                 donut.advanceFrame();
 
-                Console.WriteLine(donut.convertFrame(frame));
-
-                /* TODO: telnet here */
+                // Console.WriteLine(frame);
+                server.broadcast(frame);
 
                 Thread.Sleep(20);
             }
