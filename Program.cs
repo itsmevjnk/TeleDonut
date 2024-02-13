@@ -10,16 +10,16 @@ namespace TeleDonut
             var donut = new Donut();
             var server = new Server(IPAddress.Any);
 
-            server.start();
+            server.Start();
 
             while(true) {
-                if(server.clients.Count == 0) continue; // wait for any client before rendering
+                if (server.clients.Count == 0) continue; // wait for any client before rendering
 
-                var frame = donut.convertFrame(donut.renderFrame());
-                donut.advanceFrame();
+                var frame = donut.ConvertFrame(donut.Render());
+                donut.Advance();
 
                 // Console.WriteLine(frame);
-                server.broadcast(frame);
+                server.Broadcast(frame);
 
                 Thread.Sleep(20);
             }

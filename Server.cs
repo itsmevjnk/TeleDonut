@@ -23,21 +23,21 @@ namespace TeleDonut
             serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         }
 
-        public void start()
+        public void Start()
         {
             serverSocket.Bind(new IPEndPoint(listenIP, listenPort));
             serverSocket.Listen(0);
-            serverSocket.BeginAccept(new AsyncCallback(handleIncomingConnection), serverSocket);
+            serverSocket.BeginAccept(new AsyncCallback(HandleIncomingConnection), serverSocket);
 
             Console.WriteLine($"Listening on {listenIP} port {listenPort}");
         }
 
-        public void stop()
+        public void Stop()
         {
             serverSocket.Close();
         }
 
-        private void handleIncomingConnection(IAsyncResult result)
+        private void HandleIncomingConnection(IAsyncResult result)
         {
             try
             {
@@ -46,24 +46,24 @@ namespace TeleDonut
 
                 Console.WriteLine($"New client connected, count: {clients.Count}");
 
-                serverSocket.BeginAccept(new AsyncCallback(handleIncomingConnection), serverSocket); // resume accepting
+                serverSocket.BeginAccept(new AsyncCallback(HandleIncomingConnection), serverSocket); // resume accepting
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Console.WriteLine(e);
             }
         }
 
-        public void broadcast(string message)
+        public void Broadcast(string message)
         {
-            byte[] msgBytes = Encoding.ASCII.GetBytes(message);
+            var msgBytes = Encoding.ASCII.GetBytes(message);
 
-            var clientsCopy = new List<Socket>(clients);
-            foreach(Socket s in clientsCopy)
+            var clientsCopy = new List<Socket>(clients); // so we can remove sockets from clients as we go
+            foreach (Socket s in clientsCopy)
             {
                 try
                 {
-                    s.BeginSend(msgBytes, 0, msgBytes.Length, SocketFlags.None, new AsyncCallback(handleDataSent), s);
+                    s.BeginSend(msgBytes, 0, msgBytes.Length, SocketFlags.None, new AsyncCallback(HandleDataSent), s);
                 }
                 catch
                 {
@@ -73,7 +73,7 @@ namespace TeleDonut
             }
         }
 
-        private void handleDataSent(IAsyncResult result)
+        private void HandleDataSent(IAsyncResult result)
         {
             Socket socket = (Socket) result.AsyncState;
             try
